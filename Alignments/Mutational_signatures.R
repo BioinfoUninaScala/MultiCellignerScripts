@@ -1,9 +1,13 @@
 
+library(tidyverse)
 library(sigminer)
 library(maftools)
 library(foreach)
 library(snow)
 library(doParallel)
+
+source(utils)
+source(global_parameters)
 
 ###### Get combined_mat for Mutational Signatures data ###### 
 
@@ -45,38 +49,6 @@ pancancer_tally <- sigminer::sig_tally(mut_pancancer_maf,
 ccle_tally <- sigminer::sig_tally(mut_ccle_maf,
                                   ref_genome = "BSgenome.Hsapiens.UCSC.hg19",
                                   use_syn = TRUE)
-
-get_fitting_signature <- function(nmf_mat) {
-  
-  nmf_mat <- t(nmf_mat)
-  x_sign_all <- NULL
-  
-  for (j in 1:ncol(nmf_mat)) {
-    x_sign <- sig_fit(as.matrix(nmf_mat[,j]), sig_index = "ALL", type = "relative")
-    colnames(x_sign) <- colnames(nmf_mat)[j]    
-    x_sign_all <- cbind(x_sign_all, x_sign)
-  }
-  return(x_sign_all)
-} # nopar!
-
-get_fitting_signature <- function(nmf_mat, cores) {
-  
-  nmf_mat <- t(nmf_mat)
-  x_sign_all <- NULL
-  
-  cl <- makeCluster(cores)
-  registerDoParallel(cl)
-  
-  x_sign_list <- foreach(j = 1:ncol(nmf_mat), .combine = cbind, .packages = "sigminer") %dopar% {
-    x_sign <- sig_fit(as.matrix(nmf_mat[,j]), sig_db = "latest_SBS_GRCh37", sig_index = "ALL", type = "relative")
-    colnames(x_sign) <- colnames(nmf_mat)[j]
-    return(x_sign)
-  }
-  
-  stopCluster(cl)
-  
-  return(x_sign_list)
-} # yespar!!!!
 
 ###### Compute exposure of pre-defined signatures for each TCGA-CCLE samples ###### 
 

@@ -1,38 +1,127 @@
 
+#### Data availability ####
+# Large input matrices are not distributed with the repository.
+# Please download the required files and place them in the corresponding folders:
+#
+# DATA/
+# ├── Methylation/
+# │   ├── CCLE_RRBS_TSS_1kb_20180614.txt
+# │   ├── GDC-PANCAN_meth450.tsv.gz
+# │   └── id_tcga_pancan
+# └── Annotation/
+#     ├── sample_info_CCLE.csv
+#     └── ann_multiomics_v9.rds
+
 library(IlluminaHumanMethylation450kanno.ilmn12.hg19)
 library(GenomicRanges)
 library(tidyverse)
 library(impute)
 library(magrittr)
-library(dplyr)
 library(Seurat)
 library(data.table)
-library(fgsea)
-library(msigdbr)
-library(future)
-library(furrr)
 library(stringr)
-library(doParallel)
 
-setwd('/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal')
+source(utils)
+source(global_parameters)
 
-####  Useful Functions ####
-source('scripts/utils.R')
-source("fun/Celligner_global_param.R")
-source("fun/Celligner_helpers.R")
-source("fun/Celligner_method.R")
+#### Pre-process TCGA Data ####
+# load CCLE gene promoter coordinates
 
-useful_functions <-  ls()
+ccle_rrbs_file <- file.path(
+  "DATA", "Methylation", "CCLE_RRBS_TSS_1kb_20180614.txt"
+)
+
+if (!file.exists(ccle_rrbs_file)) {
+  stop(
+    "Missing file: CCLE_RRBS_TSS_1kb_20180614.txt\n",
+    "Please place the file in DATA/Methylation/"
+  )
+}
+
+CCLE_RRBS_1kb <- read_delim(
+  ccle_rrbs_file,
+  delim = " ",
+  escape_double = FALSE,
+  trim_ws = TRUE
+)
+
+
+
+##### Load TCGA Data #####
+
+tcga_meth_file <- file.path(
+  "DATA", "Methylation", "GDC-PANCAN_meth450.tsv.gz"
+)
+
+if (!file.exists(tcga_meth_file)) {
+  stop(
+    "Missing file: GDC-PANCAN_meth450.tsv.gz\n",
+    "Please place the file in DATA/Methylation/"
+  )
+}
+
+pancancer_meth <- fread(
+  tcga_meth_file,
+  header = FALSE
+)
+
+
+id_tcga_file <- file.path(
+  "DATA", "Methylation", "id_tcga_pancan"
+)
+
+if (!file.exists(id_tcga_file)) {
+  stop(
+    "Missing file: id_tcga_pancan\n",
+    "Please place the file in DATA/Methylation/"
+  )
+}
+
+id_tcga_pancan <- read_table(
+  id_tcga_file,
+  col_names = FALSE
+)
+
+##### Load CCLE annotation #####
+
+ccle_annot_file <- file.path(
+  "DATA", "Annotation", "sample_info_CCLE.csv"
+)
+
+if (!file.exists(ccle_annot_file)) {
+  stop(
+    "Missing file: sample_info_CCLE.csv\n",
+    "Please place the file in DATA/Annotation/"
+  )
+}
+
+sample_info_CCLE <- read_csv(
+  ccle_annot_file,
+  col_types = cols(depmap_public_comments = col_character())
+)
+
+
+
+##### Load multiomics annotation #####
+
+ann_multiomics_file <- file.path(
+  "DATA", "Annotation", "ann_multiomics_v9.rds"
+)
+
+if (!file.exists(ann_multiomics_file)) {
+  stop(
+    "Missing file: ann_multiomics_v9.rds\n",
+    "Please place the file in DATA/Annotation/"
+  )
+}
+
+ann_multiomics_v9 <- readRDS(ann_multiomics_file)
 
 
 #### Pre-process TCGA Data ####
 # load CCLE gene promoter coordinates
-CCLE_RRBS_1kb <- read_delim("DATA/Methylation/CCLE_RRBS_TSS_1kb_20180614.txt",
-                            delim = " ", escape_double = FALSE,
-                            trim_ws = TRUE)
-dim(CCLE_RRBS_1kb) # 20,192 850
-
 # load cpg coordinates
+
 loc <- data("Locations")
 loc <- as.data.frame(Locations)
 loc <- loc %>% mutate('cpg_id' = rownames(loc))
@@ -53,16 +142,9 @@ rm(list = setdiff(ls(), c('ann_cpg', 'CCLE_RRBS_1kb', "useful_functions", useful
 gc()
 
 
-##### Load TCGA Data #####
-pancancer_meth <- fread("DATA/Methylation/GDC-PANCAN_meth450.tsv.gz", header = FALSE)
-id_tcga_pancan <- read_table("DATA/Methylation/id_tcga_pancan", col_names = FALSE)
-
-dim(pancancer_meth) #51,106  9737
-
 name_pancancer <- c("cpg_id", id_tcga_pancan$X1)
 colnames(pancancer_meth) <- name_pancancer
 pancancer_meth[1:5, 1:5]
-
 
 ##### Remove cpg with no signal #####
 cpg_to_remove <- rowSums(is.na(pancancer_meth)) == ncol(pancancer_meth)-1
@@ -71,7 +153,6 @@ sum(cpg_to_remove) #5363
 new_pancancer_meth <- pancancer_meth[!cpg_to_remove, ]
 nrow(pancancer_meth) #51106
 nrow(new_pancancer_meth) #45743
-
 
 ##### Annotate TCGA cpg with corresponding genes #####
 all(new_pancancer_meth$cpg_id %in% ann_cpg$cpg_id) #TRUE
@@ -93,7 +174,6 @@ dim(f_pancancer_meth_ann) #46644  9738
 f_pancancer_meth_ann[1:5,1:5]
 
 length(unique(f_pancancer_meth_ann$gene)) #13934
-
 
 ##### From TCGA cpg matrix to TCGA gene promoter matrix #####
 
@@ -216,13 +296,6 @@ sum(is.na(pre_TCGA_meth_impute)) #0
 rm(list = setdiff( ls(), c('CCLE_RRBS_1kb', 'ann_cpg', useful_functions, "useful_functions", 'pre_TCGA_meth_impute', 'final_tcga_annot', 'sample_annot')))
 gc()
 
-#### Pre-process CCLE Data ####
-##### Load CCLE annotation #####
-sample_info_CCLE <- read_csv(
-  "/DATA/SCRATCH/romano/celligner/celligner_meth_1/celligner_meth/file/sample_info_CCLE.csv",
-  col_types = cols(depmap_public_comments = col_character())
-)
-nrow(sample_info_CCLE) # 1804
 
 sample_info_CCLE$lineage <- tolower(gsub("_", " ", sample_info_CCLE$lineage))
 unique(sample_info_CCLE$lineage) %>% sort
@@ -390,7 +463,7 @@ DE_genes_meth <- full_join(tumor_DE_genes_meth, CL_DE_genes_meth, by = 'Gene', s
 
 # take genes that are ranked in the top 1000 from either dataset, used for finding mutual nearest neighbors
 DE_gene_set_meth <- DE_genes_meth %>%
-  dplyr::filter(best_rank < celligner_global$top_DE_genes_per) %>%
+  dplyr::filter(best_rank < MultiCelligner_parameters$top_DE_genes_per) %>%
   .[['Gene']]
 
 length(unique(DE_gene_set_meth)) #1854
@@ -415,8 +488,6 @@ dim(TCGA_nrm)
 CCLE_nrm <- t(CCLE_nrm)
 TCGA_nrm <- t(TCGA_nrm)
 
-ann_multiomics_v9 <- readRDS("/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/Annotation/ann_multiomics_v9.rds")
-
 rownames(TCGA_nrm) <- str_remove(rownames(TCGA_nrm),"[A-Z]$")
 
 TCGA_nrm <- TCGA_nrm[rownames(TCGA_nrm) %in% ann_multiomics_v9$sampleID,]
@@ -429,7 +500,7 @@ grid_all_max_y <- grid_all[which.max(grid_all$prop_agree_weigh_dist.y),]
 grid_all_max_x <- grid_all[which.max(grid_all$prop_agree_weigh_dist.x),]
 
 mnn_res <- run_MNN(CCLE_cor = CCLE_nrm, TCGA_cor = TCGA_nrm,
-                   k1 = 45, k2 = 10, ndist = 3,
+                   k1 = MultiCelligner_parameters$meth_mnn_k_tumor, k2 = MultiCelligner_parameters$meth_mnn_k_CL, ndist = MultiCelligner_parameters$ndist,
                    subset_genes = DE_gene_set_meth)
 
 combined_mat_meth <- rbind(mnn_res$corrected,CCLE_nrm) 

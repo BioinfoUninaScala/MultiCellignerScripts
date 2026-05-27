@@ -1,5 +1,9 @@
 
+library(tidyverse)
 library(MoNETA)
+
+source(utils)
+source(global_parameters)
 
 combined_mat <- readRDS("/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/Expression/combined_mat.rds")
 combined_mat_meth <- readRDS("/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/Methylation/combined_mat_meth.rds")
@@ -14,62 +18,62 @@ MoNETA_exp_meth_mut <- list(exp_data = k_star_net(t(combined_mat),
                                                   sparsity = .7,
                                                   distFun = "Euclidean",
                                                   cores = 60,
-                                                  knn = 5,
-                                                  MAX_ASSOC = 5),
+                                                  knn = MultiCelligner_parameters$MoNETA_knn,
+                                                  MAX_ASSOC = MultiCelligner_parameters$MoNETA_MAX_ASSOC),
                             meth_data = k_star_net(t(combined_mat_meth),
                                                    sparsity = .7,
                                                    distFun = "Euclidean",
                                                    cores = 60,
-                                                   knn = 5,
-                                                   MAX_ASSOC = 5),
+                                                   knn = MultiCelligner_parameters$MoNETA_knn,
+                                                   MAX_ASSOC = MultiCelligner_parameters$MoNETA_MAX_ASSOC),
                             mut_data = k_star_net(t(combined_mat_mut),
                                                   sparsity = .7,
                                                   distFun = "Euclidean",
                                                   cores = 60,
-                                                  knn = 5,
-                                                  MAX_ASSOC = 5))
+                                                  knn = MultiCelligner_parameters$MoNETA_knn,
+                                                  MAX_ASSOC = MultiCelligner_parameters$MoNETA_MAX_ASSOC))
 
 #### DNA methylation - mRNA expression 
 MoNETA_exp_meth <- list(exp_data = k_star_net(t(combined_mat),
                                               sparsity = .7,
                                               distFun = "Euclidean",
                                               cores = 60,
-                                              knn = 5,
-                                              MAX_ASSOC = 5),
+                                              knn = MultiCelligner_parameters$MoNETA_knn,
+                                              MAX_ASSOC = MultiCelligner_parameters$MoNETA_MAX_ASSOC),
                         meth_data = k_star_net(t(combined_mat_meth),
                                                sparsity = .7,
                                                distFun = "Euclidean",
                                                cores = 60,
-                                               knn = 5,
-                                               MAX_ASSOC = 5))
+                                               knn = MultiCelligner_parameters$MoNETA_knn,
+                                               MAX_ASSOC = MultiCelligner_parameters$MoNETA_MAX_ASSOC))
 
 #### mRNA expression - Mutational signatures 
 MoNETA_exp_mut <- list(exp_data = k_star_net(t(combined_mat),
                                              sparsity = .7,
                                              distFun = "Euclidean",
                                              cores = 60,
-                                             knn = 5,
-                                             MAX_ASSOC = 5),
+                                             knn = MultiCelligner_parameters$MoNETA_knn,
+                                             MAX_ASSOC = MultiCelligner_parameters$MoNETA_MAX_ASSOC),
                        mut_data = k_star_net(t(combined_mat_mut),
                                              sparsity = .7,
                                              distFun = "Euclidean",
                                              cores = 60,
-                                             knn = 5,
-                                             MAX_ASSOC = 5))
+                                             knn = MultiCelligner_parameters$MoNETA_knn,
+                                             MAX_ASSOC = MultiCelligner_parameters$MoNETA_MAX_ASSOC))
 
 #### DNA methylation - Mutational signatures 
 MoNETA_meth_mut <- list(meth_data = k_star_net(t(combined_mat_meth),
                                                sparsity = .7,
                                                distFun = "Euclidean",
                                                cores = 60,
-                                               knn = 5,
-                                               MAX_ASSOC = 5),
+                                               knn = MultiCelligner_parameters$MoNETA_knn,
+                                               MAX_ASSOC = MultiCelligner_parameters$MoNETA_MAX_ASSOC),
                         mut_data = k_star_net(t(combined_mat_mut),
                                               sparsity = .7,
                                               distFun = "Euclidean",
                                               cores = 60,
-                                              knn = 5,
-                                              MAX_ASSOC = 5))
+                                              knn = MultiCelligner_parameters$MoNETA_knn,
+                                              MAX_ASSOC = MultiCelligner_parameters$MoNETA_MAX_ASSOC))
 
 
 ##### Get the multiplex network by combining the list of single-omics networks ##### 
@@ -99,17 +103,6 @@ layer_transition_3  <-  create_layer_transition_matrix(MoNETA_meth_mut)
 
 #### DNA methylation - mRNA expression - Mutational signatures 
 layer_transition_4 <- create_layer_transition_matrix(MoNETA_exp_meth_mut)
-
-##### Specify a vector for each multiplex with the likelihood of swapping in that omic layers ##### 
-
-#### DNA methylation - mRNA expression
-tau_multiomics_1 <- c(0.5,0.5)
-
-#### DNA methylation -  Mutational signatures | #### mRNA expression - Mutational signatures 
-tau_multiomics_2 <- c(0.7,0.3)
-
-#### DNA methylation - mRNA expression - Mutational signatures 
-tau_multiomics_3 <- c(0.4,0.4,0.2)
 
 ##### Compute the probability distribution of reaching other nodes in each multiplex by a random walk process ##### 
 
@@ -185,6 +178,8 @@ umap_exp_meth_mut_1 <- get_parallel_umap_embedding(emb_exp_meth_mut_1,
                                                    embedding_size = 2,
                                                    n_threads = 80,
                                                    metric = 'euclidean')
+
+#### tSNE #### 
 
 tsne_exp_meth <- get_tsne_embedding(RWR_mat_exp_meth, 
                                     embedding_size = 2, 

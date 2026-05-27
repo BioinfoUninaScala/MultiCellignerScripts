@@ -1,11 +1,91 @@
 
+#### Data availability ####
+# Large input matrices are not distributed with the repository.
+# Please download the required files and place them in the corresponding folders:
+#
+# DATA/
+# ├── Expression/
+# │   ├── 22258446
+# │   ├── 25712759
+# │   ├── TumorCompendium_v10_PolyA_hugo_log2tpm_58581genes_2019-07-25.tsv
+# │   └── CCLE_expression_full.csv
+# └── Annotation/
+#     └── fullsample_ann_expression.csv
+
+
+
+library(tidyverse)
+library(Seurat)
+
+source(utils)
+source(global_parameters)
+
 ###### Get combined_mat of mRNA Expression data ###### 
 
-hgnc.complete.set <- read.delim("/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/Expression/22258446")
-fullsample_ann_expression <- read.csv("~/celligner/fullsample_exp_celligner/25712759")
 
-TCGA_mat <- read.delim("/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/Expression/TumorCompendium_v10_PolyA_hugo_log2tpm_58581genes_2019-07-25.tsv")
-CCLE_mat <- read_csv("/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/Expression/CCLE_expression_full.csv")
+hgnc_file <- file.path(
+  "DATA", "Expression", "22258446"
+)
+
+if (!file.exists(hgnc_file)) {
+  stop(
+    "Missing file: 22258446\n",
+    "Please place the file in DATA/Expression/"
+  )
+}
+
+hgnc.complete.set <- read.delim(hgnc_file)
+
+
+
+annotation_file <- file.path(
+  "DATA", "Annotation", "fullsample_ann_expression.csv"
+)
+
+if (!file.exists(annotation_file)) {
+  stop(
+    "Missing file: fullsample_ann_expression.csv\n",
+    "Please place the file in DATA/Annotation/"
+  )
+}
+
+fullsample_ann_expression <- read.csv(annotation_file)
+
+
+
+tcga_expression_file <- file.path(
+  "DATA", "Expression",
+  "TumorCompendium_v10_PolyA_hugo_log2tpm_58581genes_2019-07-25.tsv"
+)
+
+if (!file.exists(tcga_expression_file)) {
+  stop(
+    "Missing file: TumorCompendium_v10_PolyA_hugo_log2tpm_58581genes_2019-07-25.tsv\n",
+    "Please place the file in DATA/Expression/"
+  )
+}
+
+TCGA_mat <- read.delim(tcga_expression_file)
+
+
+
+ccle_expression_file <- file.path(
+  "DATA", "Expression", "CCLE_expression_full.csv"
+)
+
+if (!file.exists(ccle_expression_file)) {
+  stop(
+    "Missing file: CCLE_expression_full.csv\n",
+    "Please place the file in DATA/Expression/"
+  )
+}
+
+CCLE_mat <- read_csv(ccle_expression_file)
+
+###### Get combined_mat of mRNA Expression data ###### 
+
+#hgnc.complete.set <- read.delim("/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/Expression/22258446")
+#fullsample_ann_expression <- read.csv("~/celligner/fullsample_exp_celligner/25712759")
 
 TCGA_mat_1 <- TCGA_mat %>%
   as.data.frame() %>%
@@ -95,20 +175,20 @@ DE_genes <- full_join(tumor_DE_genes, CL_DE_genes, by = "Gene", suffix = c("_tum
 
 ### take genes that are ranked in the top 1000 from either dataset, used for finding mutual nearest neighbors
 DE_gene_set <- DE_genes %>%
-  dplyr::filter(best_rank < celligner_global$top_DE_genes_per) %>%
+  dplyr::filter(best_rank < MultiCelligner_parameters$top_DE_genes_per) %>%
   .[["Gene"]]
 
 ### calculating all cPCs in order to empower reproducibility
 
 cov_diff_eig <- run_cPCA(TCGA_obj, CCLE_obj, pc_dims = NULL)
-cur_vecs <- cov_diff_eig$rotation[, celligner_global$remove_cPCA_dims, drop = FALSE]
+cur_vecs <- cov_diff_eig$rotation[, MultiCelligner_parameters$remove_cPCA_dims, drop = FALSE]
 rownames(cur_vecs) <- colnames(TCGA_mat_1)
 
 TCGA_cor <- resid(lm(t(TCGA_mat_1) ~ 0 + cur_vecs)) %>% t()
 CCLE_cor <- resid(lm(t(CCLE_mat_2) ~ 0 + cur_vecs)) %>% t()
 
 mnn_res <- run_MNN(CCLE_cor, TCGA_cor,
-                   k1 = celligner_global$mnn_k_tumor, k2 = celligner_global$mnn_k_CL, ndist = celligner_global$mnn_ndist,
+                   k1 = MultiCelligner_parameters$mnn_k_tumor, k2 = MultiCelligner_parameters$mnn_k_CL, ndist = MultiCelligner_parameters$mnn_ndist,
                    subset_genes = DE_gene_set
 )
 
