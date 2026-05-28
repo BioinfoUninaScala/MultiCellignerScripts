@@ -16,16 +16,16 @@ R code for generating and analyzing single-omics and multiomics alignments betwe
 
 The framework supports:
 
-Transcriptomics (RNA-seq expression)
-DNA methylation (HM450K and RRBS)
-Mutational signatures (SBS96/COSMIC)
+- mRNA expression (RNA-seq)
+- DNA methylation (HM450K and RRBS)
+- Mutational signatures (WES)
 
 and their combinations:
 
-DNA methylation + mRNA expression
-DNA methylation + Mutational signatures
-mRNA expression + Mutational signatures
-DNA methylation + mRNA expression + Mutational signatures
+- DNA methylation + mRNA expression
+- DNA methylation + Mutational signatures
+- mRNA expression + Mutational signatures
+- DNA methylation + mRNA expression + Mutational signatures
 
 ------------------------------------------------------------------------
 
@@ -39,6 +39,12 @@ DNA methylation + mRNA expression + Mutational signatures
 
 # Repository structure
 
+```text
+DATA/
+├── Annotation/
+├── Expression/
+├── Methylation/
+└── Mutational_process/
 DATA/
 ├── Annotation/
 ├── Expression/
