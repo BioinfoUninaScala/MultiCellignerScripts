@@ -5,8 +5,7 @@
 #
 # DATA/
 # ├── Expression/
-# │   ├── 22258446
-# │   ├── 25712759
+# │   ├── hgnc_complete_set
 # │   ├── TumorCompendium_v10_PolyA_hugo_log2tpm_58581genes_2019-07-25.tsv
 # │   └── CCLE_expression_full.csv
 # └── Annotation/
@@ -24,12 +23,12 @@ source(global_parameters)
 
 
 hgnc_file <- file.path(
-  "DATA", "Expression", "22258446"
+  "DATA", "Expression", "hgnc_complete_set"
 )
 
 if (!file.exists(hgnc_file)) {
   stop(
-    "Missing file: 22258446\n",
+    "Missing file: hgnc_complete_set\n",
     "Please place the file in DATA/Expression/"
   )
 }
@@ -83,9 +82,6 @@ if (!file.exists(ccle_expression_file)) {
 CCLE_mat <- read_csv(ccle_expression_file)
 
 ###### Get combined_mat of mRNA Expression data ###### 
-
-#hgnc.complete.set <- read.delim("/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/Expression/22258446")
-#fullsample_ann_expression <- read.csv("~/celligner/fullsample_exp_celligner/25712759")
 
 TCGA_mat_1 <- TCGA_mat %>%
   as.data.frame() %>%
