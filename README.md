@@ -6,7 +6,7 @@ R code for generating and analyzing single-omics and multiomics alignments betwe
 
 <p align="center">
 
-<img src="inst/www/MultiCelligner_Logo_2.png" width="200"/>
+<img src="img/MultiCelligner_Logo_2.png" width="200"/>
 
 </p>
 
@@ -31,7 +31,7 @@ and their combinations:
 
 <p align="center">
 
-<img src="inst/www/graphicalAbstract.png" width="1000"/>
+<img src="img/graphicalAbstract.png" width="1000"/>
 
 </p>
 
