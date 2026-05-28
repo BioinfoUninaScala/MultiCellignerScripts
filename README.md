@@ -28,8 +28,7 @@ DATA/
 │   └── sample_info_CCLE.csv
 │
 ├── Expression/
-│   ├── 22258446
-│   ├── 25712759
+│   ├── hgnc_complete_set
 │   ├── CCLE_expression_full.csv
 │   ├── combined_mat.rds
 │   └── TumorCompendium_v10_PolyA_hugo_log2tpm_58581genes_2019-07-25.tsv 
