@@ -1,7 +1,4 @@
 # MultiCellignerScripts
-
-R code for generating and analyzing single-omics and multiomics alignments between tumor samples and cancer cell line models.
-
 ------------------------------------------------------------------------
 
 <p align="center">
@@ -9,6 +6,10 @@ R code for generating and analyzing single-omics and multiomics alignments betwe
 <img src="img/MultiCelligner_Logo_2.png" width="200"/>
 
 </p>
+
+------------------------------------------------------------------------
+
+R code for generating and analyzing single-omics and multiomics alignments between tumor samples and cancer cell line models.
 
 ------------------------------------------------------------------------
 
