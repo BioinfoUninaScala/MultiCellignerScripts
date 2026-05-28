@@ -2,12 +2,6 @@
 ################# MultiCelligner global parameters ################# 
 
 MultiCelligner_parameters <- list(
-  # tcga_DNAmethylation_matrix = ,
-  # ccle_DNAmethylation_matrix = ,
-  # tcga_mRNAExpression_matrix = ,
-  # ccle_mRNAExpression_matrix = ,
-  # tcga_Mut_sign_matrix = ,
-  # ccle_Mut_sign_matrix = ,
   meth_mnn_k_CL = 10, # number of nearest neighbors of tumors in the cell line DNA methylation data
   meth_mnn_k_tumor = 45, # number of nearest neighbors of cell lines in the tumor DNA methylation data
   exp_mnn_k_CL = 5, # number of nearest neighbors of tumors in the cell line mRNA expression data

@@ -194,7 +194,5 @@ mnn_res <- run_MNN(CCLE_cor, TCGA_cor,
 
 combined_mat <- rbind(mnn_res$corrected, CCLE_cor)
 
-
-
-
+saveRDS(combined_mat, "DATA/Expression/combined_mat.rds")
 

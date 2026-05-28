@@ -1,12 +1,88 @@
 
+#### Data availability ####
+# Large input matrices are not distributed with the repository.
+# Please download the required files and place them in the corresponding folders:
+#
+# DATA/
+# ├── Annotation/
+# │   └── ann_multiomics_v9.rds
+# ├── Expression/
+# │   └── combined_mat.rds
+# ├── Methylation/
+# │   └── combined_mat_meth.rds
+# ├── Mutational_process/
+# │   └── combined_mat_mut.rds
+# └── Annotation/
+#     └── ann_multiomics_v9.rds
+
+
+
 library(tidyverse)
 library(MOFA2)
 
-ann_multiomics_v9 <- readRDS("/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/Annotation/ann_multiomics_v9.rds")
 
-combined_mat <- readRDS("/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/Expression/combined_mat.rds")
-combined_mat_meth <- readRDS("/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/Methylation/combined_mat_meth.rds")
-combined_mat_mut <- readRDS("/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/Mutational_process/combined_mat_mut.rds")
+
+###### Load annotation ######
+
+ann_multiomics_file <- file.path(
+  "DATA", "Annotation", "ann_multiomics_v9.rds"
+)
+
+if (!file.exists(ann_multiomics_file)) {
+  stop(
+    "Missing file: ann_multiomics_v9.rds\n",
+    "Please place the file in DATA/Annotation/"
+  )
+}
+
+ann_multiomics_v9 <- readRDS(ann_multiomics_file)
+
+
+
+###### Load combined matrices ######
+
+expression_combined_file <- file.path(
+  "DATA", "Expression", "combined_mat.rds"
+)
+
+if (!file.exists(expression_combined_file)) {
+  stop(
+    "Missing file: combined_mat.rds\n",
+    "Please place the file in DATA/Expression/"
+  )
+}
+
+combined_mat <- readRDS(expression_combined_file)
+
+
+
+methylation_combined_file <- file.path(
+  "DATA", "Methylation", "combined_mat_meth.rds"
+)
+
+if (!file.exists(methylation_combined_file)) {
+  stop(
+    "Missing file: combined_mat_meth.rds\n",
+    "Please place the file in DATA/Methylation/"
+  )
+}
+
+combined_mat_meth <- readRDS(methylation_combined_file)
+
+
+
+mutation_combined_file <- file.path(
+  "DATA", "Mutational_process", "combined_mat_mut.rds"
+)
+
+if (!file.exists(mutation_combined_file)) {
+  stop(
+    "Missing file: combined_mat_mut.rds\n",
+    "Please place the file in DATA/Mutational_process/"
+  )
+}
+
+combined_mat_mut <- readRDS(mutation_combined_file)
 
 ################# MOFA DATA INTEGRATION ################# 
 
@@ -126,4 +202,3 @@ for (j in names(MOFA_list)) {
   
 }
 
-saveRDS(MOFA_results, '/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/multiomics/MOFA/MOFA_results.rds')

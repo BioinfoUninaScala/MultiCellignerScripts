@@ -1,13 +1,68 @@
 
+#### Data availability ####
+# Large input matrices are not distributed with the repository.
+# Please download the required files and place them in the corresponding folders:
+#
+# DATA/
+# ├── Expression/
+# │   └── combined_mat.rds
+# ├── Methylation/
+# │   └── combined_mat_meth.rds
+# └── Mutational_process/
+#     └── combined_mat_mut.rds
+
+
 library(tidyverse)
 library(MoNETA)
 
 source(utils)
 source(global_parameters)
 
-combined_mat <- readRDS("/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/Expression/combined_mat.rds")
-combined_mat_meth <- readRDS("/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/Methylation/combined_mat_meth.rds")
-combined_mat_mut <- readRDS("/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/Mutational_process/combined_mat_mut.rds")
+###### Load combined matrices ######
+
+expression_combined_file <- file.path(
+  "DATA", "Expression", "combined_mat.rds"
+)
+
+if (!file.exists(expression_combined_file)) {
+  stop(
+    "Missing file: combined_mat.rds\n",
+    "Please place the file in DATA/Expression/"
+  )
+}
+
+combined_mat <- readRDS(expression_combined_file)
+
+
+
+methylation_combined_file <- file.path(
+  "DATA", "Methylation", "combined_mat_meth.rds"
+)
+
+if (!file.exists(methylation_combined_file)) {
+  stop(
+    "Missing file: combined_mat_meth.rds\n",
+    "Please place the file in DATA/Methylation/"
+  )
+}
+
+combined_mat_meth <- readRDS(methylation_combined_file)
+
+
+
+mutation_combined_file <- file.path(
+  "DATA", "Mutational_process", "combined_mat_mut.rds"
+)
+
+if (!file.exists(mutation_combined_file)) {
+  stop(
+    "Missing file: combined_mat_mut.rds\n",
+    "Please place the file in DATA/Mutational_process/"
+  )
+}
+
+combined_mat_mut <- readRDS(mutation_combined_file)
+
 
 ################# MoNETA DATA INTEGRATION ################# 
 
@@ -138,11 +193,6 @@ RWR_mat_meth_mut <- gen_sim_mat_M(network = multiplex_meth_mut,
                                   weighted_multiplex = F,
                                   cores = 80)
 
-saveRDS(RWR_mat_exp_meth ,'/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/multiomics/MoNETA/RWR_mat_exp_meth.rds')
-saveRDS(RWR_mat_exp_mut ,'/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/multiomics/MoNETA/RWR_mat_exp_mut.rds')
-saveRDS(RWR_mat_meth_mut ,'/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/multiomics/MoNETA/RWR_mat_meth_mut.rds')
-saveRDS(RWR_mat_exp_meth_mut ,'/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/multiomics/MoNETA/RWR_mat_exp_meth_mut.rds')
-
 ################# Dimensionally reductions ################# 
 
 #### Embedding #### 
@@ -151,11 +201,6 @@ emb_exp_meth_1 <- MoNETA::get_embedding(RWR_mat_exp_meth, embedding_size = 70, c
 emb_exp_mut_1 <- MoNETA::get_embedding(RWR_mat_exp_mut, embedding_size = 70, cores = 80)
 emb_meth_mut_1 <- MoNETA::get_embedding(RWR_mat_meth_mut, embedding_size = 70, cores = 80)
 emb_exp_meth_mut_1 <- MoNETA::get_embedding(RWR_mat_exp_meth_mut, embedding_size = 70, cores = 80)
-
-saveRDS(emb_exp_meth_1,'/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/multiomics/MoNETA/emb_exp_meth_1.rds')
-saveRDS(emb_exp_mut_1,'/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/multiomics/MoNETA/emb_exp_mut_1.rds')
-saveRDS(emb_meth_mut_1,'/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/multiomics/MoNETA/emb_meth_mut_1.rds')
-saveRDS(emb_exp_meth_mut_1,'/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/multiomics/MoNETA/emb_exp_meth_mut_1.rds')
 
 #### UMAP #### 
 
@@ -204,24 +249,3 @@ tsne_meth_mut <- get_tsne_embedding(RWR_mat_meth_mut,
                                     perplexity = 70, 
                                     max_iter = 20000 , 
                                     num_threads = 80)
-
-saveRDS(umap_exp_meth_1, '/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/multiomics/MoNETA/umap_exp_meth.rds')
-saveRDS(umap_exp_mut_1, '/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/multiomics/MoNETA/umap_exp_mut.rds')
-saveRDS(umap_meth_mut_1, '/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/multiomics/MoNETA/umap_meth_mut.rds')
-saveRDS(umap_exp_meth_mut_1, '/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/multiomics/MoNETA/umap_exp_meth_mut.rds')
-
-saveRDS(tsne_exp_meth, '/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/multiomics/MoNETA/tsne_exp_meth.rds')
-saveRDS(tsne_exp_meth_mut, '/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/multiomics/MoNETA/tsne_exp_meth_mut.rds')
-saveRDS(tsne_exp_mut, '/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/multiomics/MoNETA/tsne_exp_mut.rds')
-saveRDS(tsne_meth_mut, '/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/multiomics/MoNETA/tsne_meth_mut.rds')
-
-
-
-
-
-
-
-
-
-
-

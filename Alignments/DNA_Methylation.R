@@ -505,7 +505,6 @@ mnn_res <- run_MNN(CCLE_cor = CCLE_nrm, TCGA_cor = TCGA_nrm,
 
 combined_mat_meth <- rbind(mnn_res$corrected,CCLE_nrm) 
 
-align <- create_Seurat_object(combined_mat_meth, ann_multiomics_v9)
+saveRDS(combined_mat_meth, "DATA/Methylation/combined_mat_meth.rds")
 
-embeddings <- as.data.frame(Seurat::Embeddings(align, reduction = "umap"))
-new_get_alignment_plot(t(embeddings),ann_multiomics_v9 )
+

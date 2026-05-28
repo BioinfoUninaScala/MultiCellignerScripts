@@ -1,12 +1,67 @@
 
+#### Data availability ####
+# Large input matrices are not distributed with the repository.
+# Please download the required files and place them in the corresponding folders:
+#
+# DATA/
+# ├── Expression/
+# │   └── combined_mat.rds
+# ├── Methylation/
+# │   └── combined_mat_meth.rds
+# └── Mutational_process/
+#     └── combined_mat_mut.rds
+
+
+
 library(tidyverse)
 library(SNFtool)
 library(uwot)
 library(MoNETA)
 
-combined_mat <- readRDS("/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/Expression/combined_mat.rds")
-combined_mat_meth <- readRDS("/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/Methylation/combined_mat_meth.rds")
-combined_mat_mut <- readRDS("/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/Mutational_process/combined_mat_mut.rds")
+###### Load combined matrices ######
+
+expression_combined_file <- file.path(
+  "DATA", "Expression", "combined_mat.rds"
+)
+
+if (!file.exists(expression_combined_file)) {
+  stop(
+    "Missing file: combined_mat.rds\n",
+    "Please place the file in DATA/Expression/"
+  )
+}
+
+combined_mat <- readRDS(expression_combined_file)
+
+
+
+methylation_combined_file <- file.path(
+  "DATA", "Methylation", "combined_mat_meth.rds"
+)
+
+if (!file.exists(methylation_combined_file)) {
+  stop(
+    "Missing file: combined_mat_meth.rds\n",
+    "Please place the file in DATA/Methylation/"
+  )
+}
+
+combined_mat_meth <- readRDS(methylation_combined_file)
+
+
+
+mutation_combined_file <- file.path(
+  "DATA", "Mutational_process", "combined_mat_mut.rds"
+)
+
+if (!file.exists(mutation_combined_file)) {
+  stop(
+    "Missing file: combined_mat_mut.rds\n",
+    "Please place the file in DATA/Mutational_process/"
+  )
+}
+
+combined_mat_mut <- readRDS(mutation_combined_file)
 
 ################# MOFA DATA INTEGRATION ################# 
 
@@ -77,22 +132,12 @@ SNF_exp_mut <- SNFtool::SNF(list(aff_exp_mut,aff_mut_exp))
 SNF_meth_mut <- SNFtool::SNF(list(aff_meth_mut,aff_mut_meth))
 SNF_all <- SNFtool::SNF(list(aff_all_exp,aff_all_meth,aff_all_mut))
 
-saveRDS(SNF_all, '/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/multiomics/SNF/SNF_all.rds')
-saveRDS(SNF_exp_meth, '/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/multiomics/SNF/SNF_exp_meth.rds')
-saveRDS(SNF_exp_mut, '/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/multiomics/SNF/SNF_exp_mut.rds')
-saveRDS(SNF_meth_mut, '/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/multiomics/SNF/SNF_meth_mut.rds')
-
 #### UMAP #### 
 
 snf_umap_all <- uwot::umap(SNF_all, metric = "cosine")
 snf_umap_exp_meth <- uwot::umap(SNF_exp_meth, metric = "cosine")
 snf_umap_exp_mut <- uwot::umap(SNF_exp_mut, metric = "cosine")
 snf_umap_meth_mut <- uwot::umap(SNF_meth_mut, metric = "cosine")
-
-saveRDS(snf_umap_all, '/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/multiomics/SNF/snf_umap_all.rds')
-saveRDS(snf_umap_exp_meth, '/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/multiomics/SNF/snf_umap_exp_meth.rds')
-saveRDS(snf_umap_exp_mut, '/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/multiomics/SNF/snf_umap_exp_mut.rds')
-saveRDS(snf_umap_meth_mut, '/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/multiomics/SNF/snf_umap_meth_mut.rds')
 
 #### tSNE #### 
 
@@ -120,8 +165,4 @@ snf_tsne_meth_mut <- get_tsne_embedding(SNF_meth_mut,
                                         max_iter = 20000 , 
                                         num_threads = 80)
 
-saveRDS(snf_tsne_exp_meth, '/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/multiomics/SNF/snf_tsne_exp_meth.rds')
-saveRDS(snf_tsne_all, '/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/multiomics/SNF/snf_tsne_all.rds')
-saveRDS(snf_tsne_exp_mut, '/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/multiomics/SNF/snf_tsne_exp_mut.rds')
-saveRDS(snf_tsne_meth_mut, '/DATA/SCRATCH/scala/celligner/1_multiCellignerFinal/DATA/multiomics/SNF/snf_tsne_meth_mut.rds')
 
