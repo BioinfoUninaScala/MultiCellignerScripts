@@ -4,6 +4,14 @@ R code for generating and analyzing single-omics and multiomics alignments betwe
 
 ------------------------------------------------------------------------
 
+<p align="center">
+
+<img src="img/graphicalAbstract.png" width="1000"/>
+
+</p>
+
+------------------------------------------------------------------------
+
 # Data modalities
 
 The framework supports:
