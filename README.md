@@ -19,16 +19,6 @@ and their combinations:
 - mRNA expression + Mutational signatures
 - DNA methylation + mRNA expression + Mutational signatures
 
-------------------------------------------------------------------------
-
-<p align="center">
-
-<img src="img/graphicalAbstract.png" width="1000"/>
-
-</p>
-
-------------------------------------------------------------------------
-
 # Repository structure
 
 ```text
@@ -56,7 +46,6 @@ DATA/
     ├── CCLE_mutations.csv
     ├── combined_mat_mut.rds
     └── mut_pancancer.rds
-```
 
 Large matrices are not distributed with the repository and must be downloaded separately.
 
