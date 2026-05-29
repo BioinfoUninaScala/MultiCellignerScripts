@@ -10,6 +10,7 @@
 # │   └── id_tcga_pancan
 # └── Annotation/
 #     ├── sample_info_CCLE.csv
+#     ├── final_TCGAprojects_ExpMethAnnot.RDS
 #     └── ann_multiomics_v9.rds
 
 library(IlluminaHumanMethylation450kanno.ilmn12.hg19)
@@ -117,6 +118,21 @@ if (!file.exists(ann_multiomics_file)) {
 
 ann_multiomics_v9 <- readRDS(ann_multiomics_file)
 
+##### Load TCGA projects annotation #####
+
+tcga_projects_file <- file.path(
+  "DATA", "Annotation", "final_TCGAprojects_ExpMethAnnot.RDS"
+)
+
+if (!file.exists(tcga_projects_file)) {
+  stop(
+    "Missing file: final_TCGAprojects_ExpMethAnnot.RDS\n",
+    "Please place the file in DATA/Annotation/"
+  )
+}
+
+sample_annot <- readRDS(tcga_projects_file)
+
 
 #### Pre-process TCGA Data ####
 # load CCLE gene promoter coordinates
@@ -137,10 +153,6 @@ ann_cpg <- cbind(loc[queryHits(over),], rrbs_loc[subjectHits(over),]) %>%
   select("cpg_id","gene") %>% distinct %>% as_tibble
 
 ann_cpg %>% nrow #52,119
-
-rm(list = setdiff(ls(), c('ann_cpg', 'CCLE_RRBS_1kb', "useful_functions", useful_functions)))
-gc()
-
 
 name_pancancer <- c("cpg_id", id_tcga_pancan$X1)
 colnames(pancancer_meth) <- name_pancancer
@@ -192,7 +204,7 @@ t_meth_means_mat <- t(meth_means_mat)
 t_meth_means_mat[1:5,1:5]
 
 
-###### 2) fintering by sample_type + remove duplicated ######
+###### 2) filtering by sample_type + remove duplicated ######
 sample_names <- colnames(t_meth_means_mat)
 
 sample_annot <- readRDS(paste0('DATA/Annotation/final_TCGAprojects_ExpMethAnnot.RDS'))
@@ -237,8 +249,6 @@ ff_pancancer_meth_ann[1:5,1:5]
 
 final_meth_sample_annot <- meth_sample_annot %>% filter(sample.submitter_id %in% colnames(ff_pancancer_meth_ann))
 dim(final_meth_sample_annot)
-rm(sample_annot, meth_sample_annot)
-
 
 ###### 3) Transpose matrix ######
 
@@ -291,11 +301,6 @@ dim(pre_TCGA_meth_impute) #13934  7708
 
 sum(is.na(f_filtSample_methTCGA_mat)) #19842
 sum(is.na(pre_TCGA_meth_impute)) #0
-
-
-rm(list = setdiff( ls(), c('CCLE_RRBS_1kb', 'ann_cpg', useful_functions, "useful_functions", 'pre_TCGA_meth_impute', 'final_tcga_annot', 'sample_annot')))
-gc()
-
 
 sample_info_CCLE$lineage <- tolower(gsub("_", " ", sample_info_CCLE$lineage))
 unique(sample_info_CCLE$lineage) %>% sort
@@ -391,15 +396,6 @@ all(rownames(f_filtSample_CCLE_meth_means_mat) %in% final_ccle_annot$DepMap_ID)
 pre_CCLE_meth_impute <- imputeNA_by_lineage(mat = f_filtSample_CCLE_meth_means_mat,
                                             annot = final_ccle_annot, sample_column = 'DepMap_ID')
 dim(pre_CCLE_meth_impute) #  15083   731
-
-rm(list = setdiff( ls(), c(
-                           'pre_TCGA_meth_impute', 'final_tcga_annot',
-                           'pre_CCLE_meth_impute', 'final_ccle_annot',
-                           useful_functions, "useful_functions"
-                           )
-  )
-)
-gc()
 
 nrow(pre_CCLE_meth_impute) == length(unique(rownames(pre_CCLE_meth_impute)))
 
