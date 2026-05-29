@@ -28,8 +28,7 @@ DATA/
 │   └── sample_info_CCLE.csv
 │
 ├── Expression/
-│   ├── 22258446
-│   ├── 25712759
+│   ├── hgnc_complete_set
 │   ├── CCLE_expression_full.csv
 │   ├── combined_mat.rds
 │   └── TumorCompendium_v10_PolyA_hugo_log2tpm_58581genes_2019-07-25.tsv 
@@ -47,17 +46,17 @@ DATA/
 
 Large matrices are not distributed with the repository and must be downloaded separately.
 
-GDC-PANCAN_meth450.tsv.gz
+GDC-PANCAN_meth450.tsv.gz: 
 https://tcga-pancan-atlas-hub.s3.us-east-1.amazonaws.com/download/jhu-usc.edu_PANCAN_HumanMethylation450.betaValue_whitelisted.tsv.synapse_download_5096262.xena.gz
 
-CCLE_RRBS_TSS_1kb_20180614.txt 
+CCLE_RRBS_TSS_1kb_20180614.txt:
 https://depmap.org/portal/data_page/?tab=allData
 
-TumorCompendium_v10_PolyA_hugo_log2tpm_58581genes_2019-07-25.tsv 
+TumorCompendium_v10_PolyA_hugo_log2tpm_58581genes_2019-07-25.tsv:
 https://xenabrowser.net/datapages/?dataset=TumorCompendium_v10_PolyA_hugo_log2tpm_58581genes_2019-07-25.tsv&host=https%3A%2F%2Fxena.treehouse.gi.ucsc.edu%3A443
 
-CCLE_expression_full.csv
+CCLE_expression_full.csv:
 https://depmap.org/portal/data_page/?tab=allData
 
-CCLE_mutations.csv
+CCLE_mutations.csv:
 https://depmap.org/portal/data_page/?tab=allData
