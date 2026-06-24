@@ -163,7 +163,8 @@ layer_transition_4 <- create_layer_transition_matrix(MoNETA_exp_meth_mut)
 
 #### DNA methylation - mRNA expression - Mutational signatures 
 RWR_mat_exp_meth_mut <- gen_sim_mat_M(network = multiplex_exp_meth_mut,
-                                      tau = tau_multiomics_3, restart = 0.1,
+                                      tau = MultiCelligner_parameters$MoNETA_tau_meth_exp_mut, 
+                                      restart = 0.1,
                                       layer_transition = layer_transition_4,
                                       jump_neighborhood = F,
                                       weighted_multiplex = F,
@@ -171,7 +172,8 @@ RWR_mat_exp_meth_mut <- gen_sim_mat_M(network = multiplex_exp_meth_mut,
 
 #### DNA methylation - mRNA expression 
 RWR_mat_exp_meth <- gen_sim_mat_M(network = multiplex_exp_meth,
-                                  tau = tau_multiomics_1, restart = 0.1,
+                                  tau = MultiCelligner_parameters$MoNETA_tau_meth_exp, 
+                                  restart = 0.1,
                                   layer_transition = layer_transition_1,
                                   jump_neighborhood = F,
                                   weighted_multiplex = F,
@@ -179,7 +181,8 @@ RWR_mat_exp_meth <- gen_sim_mat_M(network = multiplex_exp_meth,
 
 #### mRNA expression - Mutational signatures 
 RWR_mat_exp_mut <- gen_sim_mat_M(network = multiplex_exp_mut,
-                                 tau = tau_multiomics_2, restart = 0.1,
+                                 tau = MultiCelligner_parameters$MoNETA_tau_y_mut, 
+                                 restart = 0.1,
                                  layer_transition = layer_transition_2,
                                  jump_neighborhood = F,
                                  weighted_multiplex = F,
@@ -187,7 +190,8 @@ RWR_mat_exp_mut <- gen_sim_mat_M(network = multiplex_exp_mut,
 
 #### DNA methylation - Mutational signatures 
 RWR_mat_meth_mut <- gen_sim_mat_M(network = multiplex_meth_mut,
-                                  tau = tau_multiomics_2, restart = 0.1,
+                                  tau = MultiCelligner_parameters$MoNETA_tau_y_mut, 
+                                  restart = 0.1,
                                   layer_transition = layer_transition_3,
                                   jump_neighborhood = F,
                                   weighted_multiplex = F,
